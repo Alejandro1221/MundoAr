@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de juegos</title>
+    <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Gestion de juegos</h1>
+        <p>Selecciona un juego para configuralo o crea uno nuevo.</p>
+        <!-- Sección: Lista de Juegos Creados -->
+        <div class="juegos-lista">
+            <h2>Juegos Creados</h2>
+            <div id="listaJuegos" class="juegos-container">
+                <!-- Aquí se cargarán los juegos creados desde Firestore -->
+                <p>Cargando juegos...</p>
+            </div>
+        </div>
+
+    <!-- Sección: Crear Nuevo Juego -->
+    <div class="crear-juego">
+        <h2>Crear un Nuevo Juego</h2>
+        <form id="crearJuegoForm" class="form-container">
+            <div class="form-group">
+                <label for="nombreJuego">Nombre del Juego:</label>
+                <input type="text" id="nombreJuego" name="nombreJuego" placeholder="Escribe el nombre del juego" required>
+            </div>
+            <button type="submit" class="submit-btn">Crear Juego</button>
+        </form>
+    </div>
+</div>
+
+    <script type="module" src="app/gestionarJuegos.js"></script>
+</body>
+</html>

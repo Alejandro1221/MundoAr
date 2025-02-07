@@ -1,36 +1,81 @@
 import { db } from "./firebase.js";
-import { collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { collection, query, where, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut} from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
 // Referencias a los elementos HTML
-const listaJuegos = document.getElementById('listaJuegos');
-const crearJuegoForm = document.getElementById('crearJuegoForm');
+const listaJuegos = document.getElementById("listaJuegos");
+const crearJuegoForm = document.getElementById("crearJuegoForm");
+const usuarioNombre = document.getElementById("usuarioNombre"); 
+const btnCerrarSesion = document.getElementById("btnCerrarSesion");
 
-// Cargar los juegos creados desde Firestore
-const cargarJuegos = async () => {
+const auth = getAuth();
+let usuarioActual = null; // Guardamos la referencia del usuario autenticado
+
+// Detectar usuario autenticado y cargar su información
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        usuarioActual = user; // Guardamos el usuario en la variable global
+
+        // Obtener el nombre del docente desde Firestore
+        const usuarioRef = doc(db, "docentes", user.uid);
+        const usuarioSnap = await getDoc(usuarioRef);
+
+        if (usuarioSnap.exists()) {
+            usuarioNombre.textContent = `Bienvenido, ${usuarioSnap.data().nombre}`;
+        } else {
+            usuarioNombre.textContent = `Bienvenido, ${user.email}`;
+        }
+
+        // Cargar los juegos del usuario autenticado
+        cargarJuegos(user.uid);
+    } else {
+        // Si no está autenticado, redirigir a login
+        window.location.href = "docente_login.html";
+    }
+});
+
+// Verificar que el botón existe antes de asignarle el evento
+if (!btnCerrarSesion) {
+    console.error("El botón de cerrar sesión no se encontró en el DOM.");
+} else {
+    btnCerrarSesion.addEventListener("click", async () => {
+        try {
+            await signOut(auth);
+            window.location.href = "docente_login.html"; // Redirigir a la pantalla de inicio de sesión
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+            alert("Hubo un problema al cerrar sesión.");
+        }
+    });
+}
+
+// Cargar juegos creados por el docente autenticado
+const cargarJuegos = async (uid) => {
     try {
-        const juegosSnapshot = await getDocs(collection(db, "juegos"));
-        listaJuegos.innerHTML = ''; // Limpiar la lista
+        const juegosQuery = query(collection(db, "juegos"), where("creadoPor", "==", uid));
+        const juegosSnapshot = await getDocs(juegosQuery);
+
+        listaJuegos.innerHTML = "";
 
         if (juegosSnapshot.empty) {
-            listaJuegos.innerHTML = '<p>No hay juegos creados aún.</p>';
+            listaJuegos.innerHTML = "<p>No tienes juegos creados aún.</p>";
             return;
         }
 
         juegosSnapshot.forEach((doc) => {
             const juego = doc.data();
 
-            // Crear elemento visual para cada juego
-            const juegoDiv = document.createElement('div');
-            juegoDiv.className = 'juego';
+            const juegoDiv = document.createElement("div");
+            juegoDiv.className = "juego";
 
-            const nombreDiv = document.createElement('span');
+            const nombreDiv = document.createElement("span");
             nombreDiv.textContent = juego.nombre;
 
-            const btnConfigurar = document.createElement('button');
-            btnConfigurar.textContent = 'Configurar';
-            btnConfigurar.className = 'submit-btn';
-            btnConfigurar.addEventListener('click', () => {
-                window.location.href = `configurarTablero.html?juegoId=${doc.id}`;
+            const btnConfigurar = document.createElement("button");
+            btnConfigurar.textContent = "Configurar";
+            btnConfigurar.className = "submit-btn";
+            btnConfigurar.addEventListener("click", () => {
+                window.location.href = `/modulo_docente/configurarTablero.html?juegoId=${doc.id}`;
             });
 
             juegoDiv.appendChild(nombreDiv);
@@ -39,17 +84,23 @@ const cargarJuegos = async () => {
         });
     } catch (error) {
         console.error("Error al cargar los juegos:", error);
-        listaJuegos.innerHTML = '<p>Error al cargar los juegos.</p>';
+        listaJuegos.innerHTML = "<p>Error al cargar los juegos.</p>";
     }
 };
 
-// Crear un nuevo juego
-crearJuegoForm.addEventListener('submit', async (event) => {
+// Evento para crear un nuevo juego
+crearJuegoForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const nombreJuego = document.getElementById('nombreJuego').value;
+    if (!usuarioActual) { 
+        alert("Error: No se pudo identificar al usuario. Recarga la página e intenta de nuevo.");
+        return;
+    }
+
+    const nombreJuego = document.getElementById("nombreJuego").value;
+
     if (!nombreJuego) {
-        alert('El nombre del juego es obligatorio.');
+        alert("El nombre del juego es obligatorio.");
         return;
     }
 
@@ -57,7 +108,7 @@ crearJuegoForm.addEventListener('submit', async (event) => {
         const nuevoJuego = {
             nombre: nombreJuego,
             casillas: Array(30).fill({ configuracion: null }),
-            creadoPor: "docenteId", // Cambia esto por el UID del docente autenticado
+            creadoPor: usuarioActual.uid, // Ahora usamos la variable global
             fechaCreacion: new Date(),
         };
 
@@ -65,12 +116,9 @@ crearJuegoForm.addEventListener('submit', async (event) => {
 
         alert(`Juego "${nombreJuego}" creado exitosamente.`);
         crearJuegoForm.reset();
-        cargarJuegos(); // Recargar la lista de juegos
+        cargarJuegos(usuarioActual.uid);
     } catch (error) {
         console.error("Error al crear el juego:", error);
         alert("Hubo un error al crear el juego.");
     }
 });
-
-// Cargar los juegos al iniciar
-cargarJuegos();

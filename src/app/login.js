@@ -1,5 +1,5 @@
 // Importar funciones necesarias de Firebase
-import { auth } from "./firebase.js";
+import { auth } from "../app/firebase.js";
 import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
 // Obtener el formulario de login
@@ -21,7 +21,7 @@ login.addEventListener('submit', async (e) => {
         console.log("Usuario autenticado:", usuarioAuth.user);
 
         alert("¡Inicio de sesión exitoso!");
-         window.location.href = "gestionarjuegos.html"
+         window.location.href = "../html/gestionarJuegos.html"
 
 
 

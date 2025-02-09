@@ -8,17 +8,28 @@
 </head>
 <body>
     <div class="container">
-        <button id="btnVolver" class="back-btn">← Volver</button>
-
         <h1>Configurar Casillas</h1>
-        <p>Haz clic en una casilla para configurarla.</p>
+        <p>Selecciona una casilla para asignar una plantilla.</p>
+        
+        <!-- Botón para volver -->
+        <button id="btnVolver" class="btn-volver">Volver</button>
 
-        <!-- Contenedor del tablero -->
-        <div id="tableroContainer" class="tablero-container">
-            <!-- Aquí se generarán dinámicamente las 30 casillas -->
+        <!-- Tablero de 30 casillas -->
+        <div id="tableroContainer" class="tablero-container"></div>
+    </div>
+
+    <!-- Modal para selección de plantilla -->
+    <div id="modalConfig" class="modal">
+        <div class="modal-content">
+            <span class="close" id="cerrarModal">&times;</span>
+            <h2>Seleccionar Plantilla</h2>
+            <label for="plantillaSelect">Elige una plantilla:</label>
+            <select id="plantillaSelect">
+                <option value="modelo-sonido">Modelo - Sonido</option>
+                <option value="clasificar-animales">Clasificar Animales</option>
+            </select>
+            <button id="guardarCambios">Guardar</button>
         </div>
-
-        <button id="guardarCambios" class="submit-btn">Guardar Cambios</button>
     </div>
 
     <script type="module" src="../js/configurarCasillas.js"></script>

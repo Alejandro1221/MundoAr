@@ -1,9 +1,15 @@
 import { db } from "../../app/firebase.js";
 import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-// Obtener referencia al contenedor de casillas y botón de guardar
+// Obtener referencias del DOM
 const tableroContainer = document.getElementById("tableroContainer");
+const modal = document.getElementById("modalConfig");
+const cerrarModal = document.getElementById("cerrarModal");
+const plantillaSelect = document.getElementById("plantillaSelect");
 const guardarCambiosBtn = document.getElementById("guardarCambios");
+const btnVolver = document.getElementById("btnVolver");
+
+let casillaSeleccionada = null;
 
 // Obtener el ID del juego desde la URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -14,7 +20,7 @@ if (!juegoId) {
     window.location.href = "../html/gestionarJuegos.html";
 }
 
-// Función para cargar las casillas del juego desde Firestore
+// Función para cargar las casillas desde Firestore
 const cargarCasillas = async () => {
     try {
         const juegoRef = doc(db, "juegos", juegoId);
@@ -26,22 +32,20 @@ const cargarCasillas = async () => {
         }
 
         const juegoData = juegoSnap.data();
-        tableroContainer.innerHTML = ""; // Limpiar cualquier contenido previo
+        tableroContainer.innerHTML = ""; // Limpiar antes de cargar
 
         for (let i = 0; i < 30; i++) {
             const casilla = document.createElement("div");
-            casilla.className = "casilla";
+            casilla.classList.add("casilla");
             casilla.textContent = i + 1;
 
-            // Si ya hay configuración guardada, mostrarla
-            if (juegoData.casillas[i]?.configuracion) {
-                casilla.style.backgroundColor = "#4CAF50"; // Color para indicar que ya tiene configuración
+            // Si ya hay una plantilla asignada, mostrarla
+            if (juegoData.casillas && juegoData.casillas[i]?.plantilla) {
+                casilla.textContent += ` (${juegoData.casillas[i].plantilla})`;
+                casilla.style.backgroundColor = "#4CAF50"; // Color indicando que tiene plantilla
             }
 
-            casilla.addEventListener("click", () => {
-                configurarCasilla(i);
-            });
-
+            casilla.addEventListener("click", () => abrirModal(i));
             tableroContainer.appendChild(casilla);
         }
     } catch (error) {
@@ -50,44 +54,50 @@ const cargarCasillas = async () => {
     }
 };
 
-// Función para configurar una casilla (por ahora solo cambiar color y mostrar alerta)
-const configurarCasilla = (indice) => {
-    alert(`Configurar Casilla #${indice + 1}`);
-
-    // Aquí luego permitiremos elegir plantillas o subir modelos 3D
-    document.querySelectorAll(".casilla")[indice].style.backgroundColor = "#FFD700"; // Amarillo como indicador
+// Función para abrir el modal de selección de plantilla
+const abrirModal = (indice) => {
+    casillaSeleccionada = indice;
+    modal.style.display = "block";
 };
 
-// Evento para guardar cambios en Firestore
+// Cerrar modal
+cerrarModal.addEventListener("click", () => {
+    modal.style.display = "none";
+});
+
+// Guardar la plantilla seleccionada en Firestore
 guardarCambiosBtn.addEventListener("click", async () => {
+    if (casillaSeleccionada === null) return;
+
     try {
-        const casillas = document.querySelectorAll(".casilla");
-        const nuevasConfiguraciones = [];
-
-        casillas.forEach((casilla, index) => {
-            nuevasConfiguraciones.push({
-                configuracion: casilla.style.backgroundColor === "rgb(255, 215, 0)" ? "configurada" : null
-            });
-        });
-
+        const plantilla = plantillaSelect.value;
         const juegoRef = doc(db, "juegos", juegoId);
-        await updateDoc(juegoRef, { casillas: nuevasConfiguraciones });
+        const juegoSnap = await getDoc(juegoRef);
 
-        alert("¡Cambios guardados con éxito!");
+        if (!juegoSnap.exists()) {
+            alert("Error: No se encontró el juego.");
+            return;
+        }
+
+        let casillasActualizadas = juegoSnap.data().casillas || [];
+        casillasActualizadas[casillaSeleccionada] = { plantilla: plantilla };
+
+        await updateDoc(juegoRef, { casillas: casillasActualizadas });
+
+        alert(`Plantilla "${plantilla}" asignada a la casilla ${casillaSeleccionada + 1}`);
+        modal.style.display = "none";
+        cargarCasillas(); // Recargar casillas para ver los cambios
     } catch (error) {
-        console.error("Error al guardar las configuraciones:", error);
-        alert("Hubo un error al guardar los cambios.");
+        console.error("Error al guardar la plantilla:", error);
+        alert("Hubo un error al guardar la plantilla.");
     }
 });
 
-// Referencia al botón de volver
-const btnVolver = document.getElementById("btnVolver");
-
+// Botón para volver
 btnVolver.addEventListener("click", () => {
-    window.location.href = "../html/gestionarJuegos.html"; // Redirige a la gestión de juegos
+    window.location.href = "../html/gestionarJuegos.html";
 });
 
-// Cargar las casillas al iniciar la página
+// ✅ Cargar las casillas al iniciar la página
 cargarCasillas();
-
 

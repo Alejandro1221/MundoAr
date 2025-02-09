@@ -75,7 +75,7 @@ const cargarJuegos = async (uid) => {
             btnConfigurar.textContent = "Configurar";
             btnConfigurar.className = "submit-btn";
             btnConfigurar.addEventListener("click", () => {
-                window.location.href = `/modulo_docente/configurarTablero.html?juegoId=${doc.id}`;
+                window.location.href = `../html/configurarCasillas.html?juegoId=${doc.id}`;
             });
 
             juegoDiv.appendChild(nombreDiv);

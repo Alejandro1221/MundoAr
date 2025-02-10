@@ -122,3 +122,7 @@ crearJuegoForm.addEventListener("submit", async (event) => {
         alert("Hubo un error al crear el juego.");
     }
 });
+
+document.getElementById("btnModelos3D").addEventListener("click", () => {
+    window.location.href = "banco_modelos.html"; // Redirige al banco de modelos 3D
+});

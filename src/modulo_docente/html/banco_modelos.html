@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco de Modelos 3D</title>
+    <link rel="stylesheet" href="../../main.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Banco de Modelos 3D</h1>
+
+        <!-- 🔹 Botón de Volver -->
+        <button id="btnVolver" class="btn-volver">Volver</button>
+
+        <!-- 🔹 Filtro de Categorías -->
+        <label for="filtroCategoria">Filtrar por Categoría:</label>
+        <select id="filtroCategoria">
+            <option value="Todos">Todos</option>
+            <!-- Las categorías se cargarán dinámicamente -->
+        </select>
+
+        <!-- 🔹 Botón para abrir el formulario de subida -->
+        <button id="abrirFormulario" class="btn btn-primary">➕ Subir Modelo 3D</button>
+
+        <!-- 🔹 Lista de Modelos 3D -->
+        <div id="listaModelos" class="modelos-grid">
+            <p>Cargando modelos...</p>
+        </div>
+    </div>
+
+    <!-- 🔹 Modal para subir modelos -->
+    <div id="modalSubida" class="modal">
+        <div class="modal-contenido">
+            <h3>Subir Nuevo Modelo 3D</h3>
+
+            <p><strong>Instrucciones:</strong> Selecciona una imagen de vista previa y un modelo 3D en formato .glb o .gltf.</p>
+
+            <label>Nombre del Modelo:</label>
+            <input type="text" id="nombreModelo" placeholder="Ejemplo: Perro 3D" required>
+
+            <label>Seleccionar Categoría:</label>
+            <select id="categoriaModelo">
+                <option value="Animales">Animales</option>
+                <option value="Números">Números</option>
+                <option value="Objetos">Objetos</option>
+                <option value="Otros">Otros</option>
+                <option value="nueva">➕ Nueva Categoría</option>
+            </select>
+
+            <!-- Input para nueva categoría -->
+            <input type="text" id="nuevaCategoria" placeholder="Nueva categoría" style="display:none;">
+
+            <label>Subir Imagen Miniatura (JPG, PNG):</label>
+            <input type="file" id="imagenModelo" accept=".jpg, .jpeg, .png" required>
+            <div id="vistaPreviaImagen" style="margin-top: 10px;"></div>
+
+            <label>Subir Modelo 3D (GLB, GLTF):</label>
+            <input type="file" id="archivoModelo" accept=".glb, .gltf" required>
+            <p style="font-size: 12px; color: gray;">Solo se permiten archivos en formato .glb o .gltf</p>
+
+            <div class="modal-buttons">
+                <button id="subirModelo" class="btn btn-success">📤 Subir</button>
+                <button id="cerrarFormulario" class="btn btn-danger">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/bancoModelos.js"></script>
+    <script type="module" src="../js/subirModelo.js"></script>
+</body>
+</html>

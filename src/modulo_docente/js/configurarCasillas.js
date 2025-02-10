@@ -60,6 +60,23 @@ const abrirModal = (indice) => {
     modal.style.display = "block";
 };
 
+// Cuando el docente elige una plantilla
+guardarCambiosBtn.addEventListener("click", () => {
+    const plantillaSeleccionada = plantillaSelect.value;
+
+    if (!plantillaSeleccionada) {
+        alert("Selecciona una plantilla.");
+        return;
+    }
+
+    // Si la plantilla es "Sonido-Modelo", abrir la configuración en una nueva pestaña
+    if (plantillaSeleccionada === "sonido-modelo") {
+        window.open(`../Plantillas/plantilla_sonido_modelo.html?juegoId=${juegoId}&casillaId=${casillaSeleccionada}`, "_blank");
+    }
+
+    modal.style.display = "none";
+});
+
 // Cerrar modal
 cerrarModal.addEventListener("click", () => {
     modal.style.display = "none";
@@ -97,6 +114,7 @@ guardarCambiosBtn.addEventListener("click", async () => {
 btnVolver.addEventListener("click", () => {
     window.location.href = "../html/gestionarJuegos.html";
 });
+
 
 // ✅ Cargar las casillas al iniciar la página
 cargarCasillas();

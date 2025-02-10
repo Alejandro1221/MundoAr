@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad Sonido - Modelo</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@1.7.2/aframe/build/aframe-ar.min.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs>
+        <!-- Cámara AR -->
+        <a-marker id="disparador" preset="custom" type="pattern" url="../assets/marcador.patt">
+            
+            <!-- Contenedor de los modelos 3D (se cargará dinámicamente) -->
+            <a-entity id="modelos-container"></a-entity>
+
+            <!-- Botón de sonido -->
+            <a-entity id="btn-reproducir-sonido"
+                      geometry="primitive: plane; height: 0.5; width: 1"
+                      material="color: red"
+                      position="0 1 -2"
+                      text="value: 🔊 Reproducir sonido; align: center">
+            </a-entity>
+
+        </a-marker>
+
+        <a-entity camera></a-entity>
+    </a-scene>
+
+    <script src="../js/plantillaSonidoModelo.js"></script>
+</body>
+</html>
